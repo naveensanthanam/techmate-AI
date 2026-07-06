@@ -9,7 +9,7 @@
 // STATE
 // ================================================================
 const State = {
-    apiKey: 'AQ.Ab8RN6J4JREpqbFbeKxYu9VF_BDJ00yei8P4BRxCRhPGwKyJyg', // <-- PASTE YOUR KEY HERE
+    apiKey: '', // Key is populated via UI modal or localStorage
     model: 'gemini-2.5-flash',
     sessions: [],          // all chat sessions
     currentSessionId: null,
@@ -1019,7 +1019,11 @@ function init() {
     setInterval(updateClock, 10000);
 
     // Show modal or start app
-    startApp();
+    if (!State.apiKey) {
+        DOM.apiKeyModal.style.display = 'flex';
+    } else {
+        startApp();
+    }
 
     // Hide splash screen after animation
     setTimeout(() => {
