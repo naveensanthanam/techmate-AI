@@ -9,7 +9,7 @@
 // STATE
 // ================================================================
 const State = {
-    apiKey: '', // Will be set from modal or environment
+    apiKey: '', // <-- PASTE YOUR KEY HERE OR LEAVE EMPTY TO BE PROMPTED
     model: 'gemini-2.5-flash',
     sessions: [],          // all chat sessions
     currentSessionId: null,
@@ -537,7 +537,7 @@ async function streamResponse(messages, targetBubbleId, systemPrompt) {
 async function sendMessage(userText) {
     userText = userText.trim();
     if (!userText || State.isStreaming) return;
-    // if (!State.apiKey) { showApiKeyModal(); return; }
+    if (!State.apiKey) { showApiKeyModal(); return; }
 
     // Ensure active session
     let session = getCurrentSession();
