@@ -468,7 +468,13 @@ async function callGemini(messages, systemPrompt) {
 
     if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        const msg = errData?.error?.message || `HTTP ${response.status}`;
+        let msg = errData?.error?.message || `HTTP ${response.status}`;
+        
+        // Custom override for the user's invalid OAuth key
+        if (msg.includes("invalid authentication credentials") || response.status === 401 || response.status === 403) {
+            msg = "The API key you provided is invalid. Please go to https://aistudio.google.com/app/apikey to generate a valid key (it must start with 'AIzaSy').";
+        }
+        
         throw new Error(msg);
     }
 
