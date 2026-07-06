@@ -9,7 +9,7 @@
 // STATE
 // ================================================================
 const State = {
-    apiKey: 'AQ.Ab8RN6LStXJ8bDfOR43bK-qM29ZOAqVgXb1uA4tT7RDkSxGwwQ', // <-- PASTE YOUR KEY HERE
+    apiKey: 'AQ.Ab8RN6J4JREpqbFbeKxYu9VF_BDJ00yei8P4BRxCRhPGwKyJyg', // <-- PASTE YOUR KEY HERE
     model: 'gemini-2.5-flash',
     sessions: [],          // all chat sessions
     currentSessionId: null,
@@ -379,7 +379,7 @@ function removeFeedbackButtons() {
 // GEMINI API — STREAMING
 // ================================================================
 async function callGemini(messages, systemPrompt) {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${State.model}:streamGenerateContent?alt=sse&key=${State.apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${State.model}:streamGenerateContent?alt=sse`;
 
     // Build conversation history for multi-turn
     const contents = messages.map(m => ({
@@ -404,7 +404,10 @@ async function callGemini(messages, systemPrompt) {
 
     let response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'x-goog-api-key': State.apiKey
+        },
         body: JSON.stringify(body),
     });
 
@@ -414,10 +417,7 @@ async function callGemini(messages, systemPrompt) {
         let errMsg = errData?.error?.message || '';
         const status = response.status;
 
-        // Custom override for the user's invalid OAuth key
-        if (errMsg.includes("invalid authentication credentials") || status === 401 || status === 403) {
-            errMsg = "The API key you provided is invalid. Please go to https://aistudio.google.com/app/apikey to generate a valid key (it must start with 'AIzaSy').";
-        }
+        // Custom override removed as user provided a valid key
 
         if (status === 429 || errMsg.includes('quota') || errMsg.includes('rate') || errMsg.includes('not found')) {
             console.warn(`Model ${State.model} error (${status}), auto-falling back to gemini-1.5-flash`);
@@ -429,7 +429,9 @@ async function callGemini(messages, systemPrompt) {
             }
 
             // Fetch available models first
-            const listResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${State.apiKey}`);
+            const listResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models`, {
+                headers: { 'x-goog-api-key': State.apiKey }
+            });
             if (!listResponse.ok) throw new Error("Could not fetch model list to fallback.");
             const listData = await listResponse.json();
 
@@ -454,11 +456,14 @@ async function callGemini(messages, systemPrompt) {
             };
 
             // chosenModel is already prefixed with "models/", e.g. "models/gemini-1.5-flash"
-            const fallbackEndpoint = `https://generativelanguage.googleapis.com/v1beta/${chosenModel}:streamGenerateContent?alt=sse&key=${State.apiKey}`;
+            const fallbackEndpoint = `https://generativelanguage.googleapis.com/v1beta/${chosenModel}:streamGenerateContent?alt=sse`;
 
             response = await fetch(fallbackEndpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-goog-api-key': State.apiKey
+                },
                 body: JSON.stringify(fallbackBody),
             });
 
