@@ -9,7 +9,7 @@
 // STATE
 // ================================================================
 const State = {
-    apiKey: 'AQ.Ab8RN6LS67nCMpyZphYW_RMjE4MvCNs4B2jPXh5_QqW0pbQEIQ', // <-- PASTE YOUR KEY HERE
+    apiKey: 'AQ.Ab8RN6LStXJ8bDfOR43bK-qM29ZOAqVgXb1uA4tT7RDkSxGwwQ', // <-- PASTE YOUR KEY HERE
     model: 'gemini-2.5-flash',
     sessions: [],          // all chat sessions
     currentSessionId: null,
