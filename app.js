@@ -411,8 +411,13 @@ async function callGemini(messages, systemPrompt) {
     // Auto-fallback for Quota Exceeded (429) or model not found
     if (!response.ok && State.model !== 'gemini-1.5-flash') {
         const errData = await response.json().catch(() => ({}));
-        const errMsg = errData?.error?.message || '';
+        let errMsg = errData?.error?.message || '';
         const status = response.status;
+
+        // Custom override for the user's invalid OAuth key
+        if (errMsg.includes("invalid authentication credentials") || status === 401 || status === 403) {
+            errMsg = "The API key you provided is invalid. Please go to https://aistudio.google.com/app/apikey to generate a valid key (it must start with 'AIzaSy').";
+        }
 
         if (status === 429 || errMsg.includes('quota') || errMsg.includes('rate') || errMsg.includes('not found')) {
             console.warn(`Model ${State.model} error (${status}), auto-falling back to gemini-1.5-flash`);
